@@ -8,3 +8,6 @@ require_relative 'mipala/elements/element'
 require_relative 'mipala/elements/container_element'
 require_relative 'mipala/elements/section_element'
 require_relative 'mipala/elements/text_element'
+
+require_relative 'mipala/controllers/controller'
+require_relative 'mipala/controllers/section_controller'

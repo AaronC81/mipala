@@ -5,8 +5,8 @@ module Mipala::Elements
   class ContainerElement < Element
     attr_accessor :children
 
-    def initialize definition_location, children
-      super definition_location
+    def initialize definition_location, children, render_field_keys
+      super definition_location, render_field_keys
 
       @children = children
     end

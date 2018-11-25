@@ -1,10 +1,17 @@
 module Mipala::Elements
   # Represents an element of a document.
   class Element
-    attr_reader :definition_location
+    attr_reader :definition_location, :render_fields
 
-    def initialize definition_location 
+    PENDING = :pending
+
+    def initialize definition_location, render_field_keys
       @definition_location = definition_location
+
+      @render_fields = {}
+      render_field_keys.each do |k|
+        render_fields[k] = PENDING
+      end
     end
 
     def generate_html

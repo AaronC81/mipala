@@ -28,7 +28,7 @@ module Mipala::Controllers
     end
 
     # For use with Controller subclasses. Registers a visit handler.
-    def self.on type, &block
+    def on type, &block
       @handlers[type] = block
     end
   end

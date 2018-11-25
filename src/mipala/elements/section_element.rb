@@ -5,10 +5,15 @@ module Mipala::Elements
   class SectionElement < ContainerElement
     attr_accessor :name
 
-    def initialize(definition_location, children, name)
-      super(definition_location, children)
+    def initialize definition_location, children, name
+      super definition_location, children, [:number]
 
       @name = name
+    end
+
+    def generate_html
+      # TODO: Multilevel sections
+      "<h1>#{render_fields[:number]} - #{@name}</h1>" + super
     end
   end
 end

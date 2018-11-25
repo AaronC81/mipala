@@ -6,7 +6,7 @@ module Mipala::Elements
     attr_accessor :text
 
     def initialize definition_location, text
-      super definition_location
+      super definition_location, []
 
       @text = text
     end
