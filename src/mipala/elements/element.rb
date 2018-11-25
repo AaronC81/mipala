@@ -8,7 +8,11 @@ module Mipala::Elements
     end
 
     def generate_html
-      raise 'You must override override Element#generate_html'
+      raise 'You must override Element#generate_html'
+    end
+
+    def visit &block
+      yield_self &block
     end
   end
 end

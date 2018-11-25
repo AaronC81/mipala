@@ -15,5 +15,10 @@ module Mipala::Elements
       children_as_html = children.map &:generate_html
       children_as_html.inject :+
     end
+
+    def visit &block
+      super &block
+      children.each { |x| x.visit &block }
+    end
   end
 end
