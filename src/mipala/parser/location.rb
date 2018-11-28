@@ -3,7 +3,7 @@ module Mipala::Parser
   class Location
     attr_reader :file, :row, :column
 
-    def initialize(file, row, column)
+    def initialize file, row, column
       @file = file
       @row = row
       @column = column
@@ -11,7 +11,7 @@ module Mipala::Parser
 
     # A "null" location.
     def self.anonymous
-      Location.new("<anonymous>", -1, -1)
+      Location.new '<anonymous>', -1, -1
     end
   end
 end
