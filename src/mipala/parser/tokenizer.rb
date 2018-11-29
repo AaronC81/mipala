@@ -22,7 +22,6 @@ module Mipala::Parser
       current_indentation = 0 # not implemented
       mode = :text
       until done?
-        puts @pointer
         # Recognise symbols
         if here == ':'
           push.call :sym_colon, here
