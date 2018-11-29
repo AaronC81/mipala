@@ -22,7 +22,7 @@ module Mipala::Controllers
       
       doc.visit do |element|
         @handlers.each do |k, v|
-          v.(element) if element.is_a? k
+          v.call element if element.is_a? k
         end
       end
     end
