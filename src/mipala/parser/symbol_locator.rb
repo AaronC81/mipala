@@ -14,7 +14,8 @@ module Mipala::Parser
     end
 
     # Returns an array of LocatedSymbol objects representing the locations of 
-    # particular symbols inside the string.
+    # particular symbols inside the string. These will be sorted in order of
+    # occurance.
     def symbol_locations
       col = 1
       row = 1
