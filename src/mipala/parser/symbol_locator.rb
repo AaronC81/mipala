@@ -4,7 +4,7 @@ module Mipala::Parser
   # as such could return objects such as full-stops which should in fact be
   # interpreted as text.
   class SymbolLocator
-    LocatedSymbol = Struct.new('LocatedSymbol', :symbol, :location)
+    LocatedSymbol = Struct.new 'LocatedSymbol', :symbol, :location
 
     attr_reader :text, :file
 
