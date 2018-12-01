@@ -7,5 +7,11 @@ module Mipala::Parser
       dot: '.',
       backslash: '\\'
     }.freeze
+
+    TOKEN_KINDS = [
+      :text,
+      :symbol,
+      :space_count
+    ]
   end
 end
