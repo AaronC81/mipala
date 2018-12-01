@@ -4,6 +4,8 @@ module Mipala::Parser
   # as such could return objects such as full-stops which should in fact be
   # interpreted as text.
   class SymbolLocator
+    LocatedSymbol = Struct.new('LocatedSymbol', :symbol, :location)
+
     attr_reader :text, :file
 
     def initialize text, file=nil
@@ -11,9 +13,8 @@ module Mipala::Parser
       @file = file
     end
 
-    # Returns an array of arrays representing the locations of particular
-    # symbols inside the string, in the form [[symbol, location], ...] where
-    # symbol is a key of Mipala::Parser::Constants::SYMBOLS.
+    # Returns an array of LocatedSymbol objects representing the locations of 
+    # particular symbols inside the string.
     def symbol_locations
       col = 1
       row = 1
@@ -29,8 +30,8 @@ module Mipala::Parser
 
         # Return according to whether this is a symbol
         val = Mipala::Parser::Constants::SYMBOLS.key_for_value char
-        val.nil? ? nil : [val, Location.new(file, row, col)]
-      end.reject(&:nil?)
+        val.nil? ? nil : LocatedSymbol.new(val, Location.new(file, row, col))
+      end.reject &:nil?
     end
   end
 end
