@@ -47,10 +47,16 @@ module Mipala::Parser
       # Convert the final character of each string into a :symbol token, and
       # the rest into a :text token
       sliced_strings.zip(symbol_locations).flat_map do |text, symbol_location|
-        [
-          Token.new(:text, text[0...-1]),
-          Token.new(:symbol, symbol_location.symbol)
-        ]
+        if symbol_location.nil?
+          # If the document doesn't end with a symbol...
+          Token.new(:text, text) 
+        else
+          # If it does...
+          [
+            Token.new(:text, text[0...-1]),
+            Token.new(:symbol, symbol_location.symbol)
+          ]
+        end
       end
     end
   end
