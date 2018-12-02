@@ -3,7 +3,7 @@ module Mipala::Parser
   class Tokenizer
     include Mipala::Mixins::Contracts
 
-    Token = Struct.new 'Token', :type, :value
+    Token = Struct.new('Token', :type, :value)
 
     attr_reader :text, :symbol_locations
 
@@ -13,33 +13,44 @@ module Mipala::Parser
         SymbolLocator::LocatedSymbol
     end
 
+    # Given a text index, returns a boolean indicating whether there is a symbol
+    # at that index.
+    def is_symbol?(index)
+      symbol_locations.any? do |sym_loc|
+        sym_loc.location.character_index(text) == index
+      end
+    end
+
     # Returns an array of Token objects for this text and symbol locations.
     def tokenize
       # This is implemented by splitting the text on symbols and inserting
       # tokens on the splits
 
       # TODO: !!!HANDLE SPACES AT BEGINNING OF LINES!!!
-      # TODO: This code is almost illegible
 
       # Slice each character if there's a symbol there; this leaves the symbol
       # at the end of the character array
       # TODO: This is O(n^2), not great
-      sliced_text = text.chars.each_with_index.slice_when do |(char, i)|
-        # Slice if this character is a symbol
-        symbol_locations.any? do |sym_loc|
-          (sym_loc.location.character_index text) == i
-        end
-      end.map { |str_with_index| str_with_index.map { |str, i| str }.join }
+      # Get text characters as array with index
+      chars_with_index = text.chars.each_with_index
 
-      # Convert this list of strings into tokens and return it
-      symbol_pointer = 0
-      sliced_text.flat_map do |string|
-        text_token = Token.new :text, string[0..-2] # remove last char
-        symbol_token = Token.new :symbol,
-          symbol_locations[symbol_pointer].symbol
+      # Slice on symbols into 2D array of chars and indeces
+      sliced_chars_with_index = chars_with_index.slice_when do |(_, i)|
+        is_symbol? i
+      end
+      
+      # Remove indexes and join nested arrays into strings
+      sliced_strings = sliced_chars_with_index.map do |str_with_index|
+        str_with_index.map(&:first).join
+      end
 
-        symbol_pointer += 1
-        [text_token, symbol_token]
+      # Convert the final character of each string into a :symbol token, and
+      # the rest into a :text token
+      sliced_strings.zip(symbol_locations).flat_map do |text, symbol_location|
+        [
+          Token.new(:text, text[0...-1]),
+          Token.new(:symbol, symbol_location.symbol)
+        ]
       end
     end
   end
