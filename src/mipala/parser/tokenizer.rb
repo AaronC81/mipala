@@ -26,8 +26,6 @@ module Mipala::Parser
       # This is implemented by splitting the text on symbols and inserting
       # tokens on the splits
 
-      # TODO: !!!HANDLE SPACES AT BEGINNING OF LINES!!!
-
       # Slice each character if there's a symbol there; this leaves the symbol
       # at the end of the character array
       # Get text characters as array with index
@@ -45,18 +43,42 @@ module Mipala::Parser
 
       # Convert the final character of each string into a :symbol token, and
       # the rest into a :text token
-      sliced_strings.zip(symbol_locations).flat_map do |text, symbol_location|
-        if symbol_location.nil?
+      tokens = sliced_strings.zip(symbol_locations).flat_map do |text, sym_loc|
+        if sym_loc.nil?
           # If the document doesn't end with a symbol...
           Token.new(:text, text) 
         else
           # If it does...
           [
             Token.new(:text, text[0...-1]),
-            Token.new(:symbol, symbol_location.symbol)
+            Token.new(:symbol, sym_loc.symbol)
           ]
         end
       end
+
+      # Convert spaces at the beginning of lines to :space_count tokens
+      tokens_with_space_counts = tokens.flat_map do |token|
+        # We're only looking for :text tokens with newlines
+        next token unless token.type == :text && token.value.include?("\n")
+
+        # Split on the newlines, retaining them in the output
+        line_segments = token.value.split("\n").map { |x| x + "\n" }
+        line_segments[-1] = line_segments[-1][0...-1] # The last element shouldn't have a newline
+
+        # Create tokens from these segments
+        line_segments.flat_map do |seg|
+          # Count the number of spaces at the beginning of the string
+          spaces_at_start = seg.scan(/^ */).first.length
+
+          # Return a space count and a text token
+          [
+            Token.new(:space_count, spaces_at_start),
+            Token.new(:text, seg.gsub(/^ +/, ''))
+          ]
+        end
+      end
+
+      # TODO: Convert spaces into indent/dedent, maybe separate step
     end
   end
 end
