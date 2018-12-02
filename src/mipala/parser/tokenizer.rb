@@ -30,7 +30,6 @@ module Mipala::Parser
 
       # Slice each character if there's a symbol there; this leaves the symbol
       # at the end of the character array
-      # TODO: This is O(n^2), not great
       # Get text characters as array with index
       chars_with_index = text.chars.each_with_index
 
