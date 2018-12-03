@@ -19,6 +19,11 @@ module Mipala::Parser
       end
     end
 
+    # Given an array of tokens, returns a copy without any empty text tokens.
+    def reject_empty_text(arr)
+      arr.reject { |x| x.type == :text && x.value == "" }
+    end
+
     # Returns an array of Token objects for this text and symbol locations.
     def tokenize
       # This is implemented by splitting the text on symbols and inserting
@@ -43,10 +48,10 @@ module Mipala::Parser
       # the rest into a :text token
       tokens = sliced_strings.zip(symbol_locations).flat_map do |text, sym_loc|
         if sym_loc.nil?
-          # If the document doesn't end with a symbol...
+          # If the document doesn't end with a symbol, just return text
           Token.new(:text, text) 
         else
-          # If it does...
+          # If it does, return both text minus symbol, and then a symbol token
           [
             Token.new(:text, text[0...-1]),
             Token.new(:symbol, sym_loc.symbol)
@@ -54,27 +59,26 @@ module Mipala::Parser
         end
       end
 
+      # Strip any empty tokens (can occur when symbols are adjacent)
+      tokens_without_empty = reject_empty_text(tokens)
+
+      # Add a :nil token to the beginning to make each_cons work properly
+      tokens_without_empty.unshift(Token.new(:nil, nil))
+
       # Convert spaces at the beginning of lines to :space_count tokens
-      tokens.flat_map do |token|
-        # We're only looking for :text tokens with newlines
-        next token unless token.type == :text && token.value.include?("\n")
+      tokens_without_empty.each_cons(2).flat_map do |token1, token2|
+        # We're only looking for :text tokens with :newline tokens before them
+        next token2 unless token1.type == :symbol && token1.value == :newline \
+          && token2.type == :text
 
-        # Split on the newlines, retaining them in the output
-        line_segments = token.value.split("\n").map { |x| x + "\n" }
-        line_segments[-1] = line_segments[-1][0...-1] # The last element shouldn't have a newline
+        # Count the number of spaces at the beginning of the string
+        spaces_at_start = token2.value.scan(/^ */).first.length
 
-        # Create tokens from these segments
-        line_segments.flat_map do |seg|
-          p seg
-          # Count the number of spaces at the beginning of the string
-          spaces_at_start = seg.scan(/^ */).first.length
-
-          # Return a space count and a text token
-          [
-            Token.new(:space_count, spaces_at_start),
-            Token.new(:text, seg.gsub(/^ +/, ''))
-          ]
-        end
+        # Return a space count and a text token
+        [
+          Token.new(:space_count, spaces_at_start),
+          Token.new(:text, token2.value.gsub(/^ +/, ''))
+        ]
       end
     end
   end
