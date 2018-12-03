@@ -68,7 +68,7 @@ module Mipala::Parser
       # Convert spaces at the beginning of lines to :space_count tokens
       tokens_without_empty.each_cons(2).flat_map do |token1, token2|
         # We're only looking for :text tokens with :newline tokens before them
-        next token2 unless token1.type == :symbol && token1.value == :newline \
+        next token2 unless token1 == Token.new(:symbol, :newline) \
           && token2.type == :text
 
         # Count the number of spaces at the beginning of the string
