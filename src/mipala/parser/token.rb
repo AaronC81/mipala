@@ -17,6 +17,14 @@ module Mipala::Parser
       to_s
     end
 
+    def ==(other)
+      other.is_a?(Token) && other.type == type && other.value == value
+    end
+
+    def hash
+      type.hash + value.hash
+    end
+
     def to_s
       return ">" if type == :indent
       return "<" if type == :dedent
