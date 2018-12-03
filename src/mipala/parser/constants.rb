@@ -5,13 +5,17 @@ module Mipala::Parser
       lparen: '(',
       rparen: ')',
       dot: '.',
-      backslash: '\\'
+      backslash: '\\',
+      colon: ':',
+      newline: '\n'
     }.freeze
 
     TOKEN_KINDS = [
       :text,
       :symbol,
-      :space_count
+      :space_count,
+      :indent,
+      :dedent
     ]
   end
 end
