@@ -66,7 +66,7 @@ module Mipala::Parser
       tokens_without_empty.unshift(Token.new(:nil, nil))
 
       # Convert spaces at the beginning of lines to :space_count tokens
-      tokens_without_empty.each_cons(2).flat_map do |token1, token2|
+      tokens_with_space_counts = tokens_without_empty.each_cons(2).flat_map do |token1, token2|
         # We're only looking for :text tokens with :newline tokens before them
         next token2 unless token1 == Token.new(:symbol, :newline) \
           && token2.type == :text
@@ -80,6 +80,32 @@ module Mipala::Parser
           Token.new(:text, token2.value.gsub(/^ +/, ''))
         ]
       end
+
+      # Convert :space_count tokens to indents and dedents
+      indent_level = 0 # current level of indentation
+      indent_amount = nil # spaces required for an indent
+      tokens_with_space_counts.flat_map do |token|
+        # Only look for :space_count tokens
+        next token unless token.type == :space_count
+
+        # If this is any form of indentation and we don't know an indent amount
+        # yet, set it
+        indent_amount = token.value if indent_amount.nil? && !token.value.zero?
+
+        # If we still don't know, skip
+        next nil if indent_amount.nil?
+
+        # Work out an indent delta
+        # +x = indent by x levels, -x = dedent by x levels; x must be int
+        indent_delta = token.value.to_f / indent_amount - indent_level
+        raise 'invalid indentation' unless indent_delta % 1 == 0.0
+
+        indent_level += indent_delta.to_i
+
+        # Output tokens
+        [Token.new(indent_delta.positive? ? :indent : :dedent, nil)] \
+          * indent_delta.abs
+      end.reject(&:nil?)
     end
   end
 end
