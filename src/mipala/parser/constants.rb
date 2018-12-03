@@ -7,7 +7,7 @@ module Mipala::Parser
       dot: '.',
       backslash: '\\',
       colon: ':',
-      newline: '\n'
+      newline: "\n"
     }.freeze
 
     TOKEN_KINDS = [
@@ -15,7 +15,8 @@ module Mipala::Parser
       :symbol,
       :space_count,
       :indent,
-      :dedent
+      :dedent,
+      :nil
     ].freeze
   end
 end
