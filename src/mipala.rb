@@ -6,6 +6,7 @@ require_relative 'mipala/extensions/hash'
 require_relative 'mipala/parser/constants'
 require_relative 'mipala/parser/location'
 require_relative 'mipala/parser/symbol_locator'
+require_relative 'mipala/parser/token'
 require_relative 'mipala/parser/tokenizer'
 
 require_relative 'mipala/elements/element'
