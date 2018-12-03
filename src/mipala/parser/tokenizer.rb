@@ -3,8 +3,6 @@ module Mipala::Parser
   class Tokenizer
     include Mipala::Mixins::Contracts
 
-    Token = Struct.new('Token', :type, :value)
-
     attr_reader :text, :symbol_locations
 
     def initialize(text, symbol_locations)
