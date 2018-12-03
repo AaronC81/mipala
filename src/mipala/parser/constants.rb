@@ -16,6 +16,6 @@ module Mipala::Parser
       :space_count,
       :indent,
       :dedent
-    ]
+    ].freeze
   end
 end
