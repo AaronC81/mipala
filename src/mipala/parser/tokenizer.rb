@@ -1,5 +1,6 @@
 module Mipala::Parser
   # Converts a list of symbol locations into Token structs.
+  # TODO: Further refactoring
   class Tokenizer
     include Mipala::Mixins::Contracts
 
@@ -19,6 +20,17 @@ module Mipala::Parser
       end
     end
 
+    # Given a string of text, splits it wherever there is a symbol according to
+    # the #symbol_locations attribute of this instance. The symbol is left at
+    # the end of each array element.
+    def split_on_symbol_locations(string)
+      string
+        .chars
+        .each_with_index
+        .slice_when { |(_, index)| is_symbol?(index) }
+        .map { |result_with_indeces| result_with_indeces.map(&:first).join }
+    end
+
     # Given an array of tokens, returns a copy without any empty text tokens.
     def reject_empty_text(arr)
       arr.reject { |x| x.type == :text && x.value == "" }
@@ -26,23 +38,9 @@ module Mipala::Parser
 
     # Returns an array of Token objects for this text and symbol locations.
     def tokenize
-      # This is implemented by splitting the text on symbols and inserting
-      # tokens on the splits
-
       # Slice each character if there's a symbol there; this leaves the symbol
       # at the end of the character array
-      # Get text characters as array with index
-      chars_with_index = text.chars.each_with_index
-
-      # Slice on symbols into 2D array of chars and indeces
-      sliced_chars_with_index = chars_with_index.slice_when do |(_, i)|
-        is_symbol? i
-      end
-      
-      # Remove indexes and join nested arrays into strings
-      sliced_strings = sliced_chars_with_index.map do |str_with_index|
-        str_with_index.map(&:first).join
-      end
+      sliced_strings = split_on_symbol_locations(text)
 
       # Convert the final character of each string into a :symbol token, and
       # the rest into a :text token
