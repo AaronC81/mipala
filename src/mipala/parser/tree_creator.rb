@@ -10,13 +10,25 @@ module Mipala::Parser
 
     def create_tree
       @pointer = 0
+      # TODO: Probably need to accept many nodes; maybe implicit body parent?
+      expect_node
     end
 
     protected
 
+    # Creates a node, beginning from the current pointer. Throws an exception
+    # if this is not possible.
+    def expect_node
+      
+    end
+
+    def end?
+      pointer == tokens.length
+    end
+
     # Gets the token at the pointer.
     def here
-      tokens[pointer]
+      tokens[pointer] || raise 'exhausted token stream'
     end
 
     # Advances the token pointer.
@@ -41,6 +53,19 @@ module Mipala::Parser
       result = here
       advance
       result
+    end
+
+    # Accepts as many of the specified token type as possible, returning an
+    # array of them. This array could be empty. The token pointer is advanced
+    # to one place after this array. This will not throw an exception upon
+    # reaching the end of the token stream.
+    def accept_many(type)
+      tokens = []
+      while !end? && here.type == type
+        tokens << here
+        advance
+      end
+      tokens
     end
   end
 end
